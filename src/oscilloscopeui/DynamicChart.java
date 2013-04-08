@@ -1,15 +1,17 @@
 package oscilloscopeui;
 
-import info.monitorenter.gui.chart.*;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.axis.*;
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.util.Range;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 import javax.swing.JPanel;
 
 /**
@@ -21,6 +23,7 @@ public class DynamicChart {
     private Chart2D chart;
     private ITrace2D trace;
     private Date startTime;
+    private List<Integer> samplesBuffer;
 
     public DynamicChart() {
         initilizeChart();
@@ -32,11 +35,12 @@ public class DynamicChart {
     }
 
     public void startPlotting() {
+        updateChartSettings();
         startTime = new Date();
     }
 
     public void stopPlotting() {
-        chart.removeAllTraces();
+        samplesBuffer.clear();
     }
 
     public void addXY(double x, double y) {
@@ -45,38 +49,48 @@ public class DynamicChart {
 
     public void addY(double y) {
         Date now = new Date();
-        trace.addPoint((now.getTime() - startTime.getTime()), y);
+        this.addXY((now.getTime() - startTime.getTime()), y);
     }
 
-    @Deprecated
-    public void startTestDrive() {
-        Timer timer = new Timer(true);
-        TimerTask task = new TimerTask() {
-
-            private double m_y = 0;
-            private long m_starttime = System.currentTimeMillis();
-
-            @Override
-            public void run() {
-                double rand = Math.random();
-                boolean add = (rand >= 0.5) ? true : false;
-                this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();
-                trace.addPoint(((double) System.currentTimeMillis() - this.m_starttime), this.m_y);
+    public void bufferizeValue(int value, int samplesCount) {
+        if (samplesBuffer.size() <= samplesCount) {
+            samplesBuffer.add(value);
+        } else {
+            double sample = 0;
+            for (double d : samplesBuffer) {
+                sample += d;
             }
-        };
-        timer.schedule(task, 1000, 20);
+            sample /= samplesCount;
+            sample *= Config.DynamicChart.MAX_RANGE / 1024;
+            sample += Config.DynamicChart.GAIN;
+            this.addY(sample);
+            samplesBuffer.clear();
+        }
+    }
+
+    public void updateChartSettings() {
+        if (!Config.DynamicChart.AUTO_SCALE) {
+            chart.getAxisY().setRangePolicy(new RangePolicyFixedViewport(
+                    new Range(Config.DynamicChart.MIN_RANGE, Config.DynamicChart.MAX_RANGE)));
+        } else {
+            chart.getAxisY().setRangePolicy(new RangePolicyUnbounded());
+        }
+        chart.removeAllTraces();
+        trace = new Trace2DLtd(Config.DynamicChart.BUFFER_OFFSET);
+        trace.setName("Channel 1");
+        trace.setStroke(new BasicStroke(1.5f));
+        trace.setPhysicalUnits("ms", "Volts");
+        trace.setColor(Color.RED);
+        chart.addTrace(trace);
     }
 
     private void initilizeChart() {
         chart = new Chart2D();
-        trace = new Trace2DLtd(5000);
-        trace.setName("Channel 1");
-        trace.setPhysicalUnits("mSecs", "Volts");
-        chart.setUseAntialiasing(true);
-        chart.getAxisY().setRangePolicy(new RangePolicyFixedViewport(new Range(0, 2.56)));
-        trace.setColor(Color.RED);
-        chart.addTrace(trace);
+        this.updateChartSettings();
         chart.getAxisY().setPaintGrid(true);
+        chart.getAxisX().getAxisTitle().setTitle("t");
+        chart.getAxisY().getAxisTitle().setTitle("V");
+        samplesBuffer = new ArrayList<>();
     }
 
     private void addChartToPanel(JPanel panel) {
