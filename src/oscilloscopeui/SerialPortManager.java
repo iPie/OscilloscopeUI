@@ -37,10 +37,10 @@ public class SerialPortManager {
             if (!serialPort.isOpened()) {
                 serialPort.openPort();
                 serialPort.setParams(Config.SerialPort.BAUND_RATE, Config.SerialPort.DATA_BITS,
-                        Config.SerialPort.STOP_BITS, Config.SerialPort.PARITY);//Set params
-                int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;//Prepare mask
-                serialPort.setEventsMask(mask);//Set mask   
-                serialPort.addEventListener(new SerialPortReader());//Add SerialPortEventListener 
+                        Config.SerialPort.STOP_BITS, Config.SerialPort.PARITY);
+                int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;
+                serialPort.setEventsMask(mask);
+                serialPort.addEventListener(new SerialPortReader());
             } else {
                 throw new SerialPortException(this.getSerialPortName(), "stopListening()", SerialPortException.TYPE_PORT_ALREADY_OPENED);
             }
@@ -81,14 +81,14 @@ public class SerialPortManager {
                 } catch (SerialPortException ex) {
                     System.out.println(ex);
                 }
-            } else if (event.isCTS()) {//If CTS line has changed state
-                if (event.getEventValue() == 1) {//If line is ON
+            } else if (event.isCTS()) {
+                if (event.getEventValue() == 1) {
                     System.out.println("CTS - ON");
                 } else {
                     System.out.println("CTS - OFF");
                 }
-            } else if (event.isDSR()) {///If DSR line has changed state
-                if (event.getEventValue() == 1) {//If line is ON
+            } else if (event.isDSR()) {
+                if (event.getEventValue() == 1) {
                     System.out.println("DSR - ON");
                 } else {
                     System.out.println("DSR - OFF");
@@ -97,19 +97,24 @@ public class SerialPortManager {
         }
 
         private void parseBuffer(byte[] buffer, int length) {
+            /*
+             * TODO: DAFUQ is this?? Reintroduced bug.
+             */
             try {
-                for (int i = 0; i < length - 2; i += 2) {
-                    if (buffer[i] == '\0' || buffer[i + 1] == '\0') {
-                        if (i > length - 3) {
-                            break;
-                        }
+                for (int i = 0; i < length - 1; i++) {
+                    if (i < length - 1 && buffer[i] == '\000') {
                         i++;
-                    }
-                    int res = buffer[i + 1] << 8 | buffer[i];
-                    if (res > 1023) {
-                        i++;
+                    } else if (i < length - 2 && buffer[i + 1] == '\000') {
+                        i += 2;
                     } else {
-                        chart.bufferizeValue(res, Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT);
+                        int res = buffer[i + 1] << 8 | buffer[i];
+                        i += 2;
+                        if (res > 1023) {
+                            System.out.println("res exceeded 1023: " + res);
+                            //i++;
+                        } else {
+                            chart.bufferizeValue(res, Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT);
+                        }
                     }
                 }
             } catch (Exception ex) {

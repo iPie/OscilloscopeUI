@@ -48,6 +48,7 @@ public class DynamicChart {
     }
 
     public void addY(double y) {
+        // TODO: handle time overflow!
         Date now = new Date();
         this.addXY((now.getTime() - startTime.getTime()), y);
     }
@@ -60,9 +61,9 @@ public class DynamicChart {
             for (double d : samplesBuffer) {
                 sample += d;
             }
-            sample /= samplesCount;
-            sample *= Config.DynamicChart.MAX_RANGE / 1024;
-            sample += Config.DynamicChart.GAIN;
+            sample = (sample / samplesCount)
+                    * (Config.DynamicChart.REFERENCE_VOLTAGE / Config.DynamicChart.ADC_RESOLUTION)
+                    + Config.DynamicChart.GAIN;
             this.addY(sample);
             samplesBuffer.clear();
         }

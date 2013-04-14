@@ -217,6 +217,7 @@
                 <StringItem index="6" value="512"/>
               </StringArray>
             </Property>
+            <Property name="selectedIndex" type="int" value="3"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox2ActionPerformed"/>

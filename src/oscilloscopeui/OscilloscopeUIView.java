@@ -49,6 +49,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         } catch (SerialPortException ex) {
             Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
             jToggleButton1.setSelected(false);
+            initializePortList();
         }
     }
 
@@ -65,7 +66,6 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             jToggleButton1.setSelected(false);
             setPlotSettingsComponentsState(true);
         }
-
     }
 
     private void initializePeripherals() {
@@ -74,7 +74,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             dynamicChart = new DynamicChart(jPanel1);
             initializePortList();
         } catch (NullPointerException ex) {
-            System.out.println("Could not initialize peripherals");
+            System.err.println("Could not initialize peripherals");
             Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -162,6 +162,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         jLabel3.setText("Antialiasing:");
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "8", "16", "32", "64", "128", "256", "512" }));
+        jComboBox2.setSelectedIndex(3);
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
