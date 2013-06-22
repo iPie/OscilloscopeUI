@@ -12,6 +12,7 @@ public class Config {
         public static int DATA_BITS = 8;
         public static int STOP_BITS = 1;
         public static int PARITY = 0;
+        public static boolean DEBUG_SERIAL_PORT = false;
     }
 
     public static class DynamicChart {
