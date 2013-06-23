@@ -18,6 +18,17 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
      * Creates new form OscilloscopeUIView
      */
     public OscilloscopeUIView() {
+        Config.loadConfigFile();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                Config.saveConfigFile();
+                try {
+                    serialPortManager.stopListening();
+                } catch (Exception e) {
+                }
+            }
+        });
         initComponents();
         initializePeripherals();
     }
@@ -31,9 +42,9 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     }
 
     private void invokeConfigureChartAutoScaleState(boolean isOn) {
-        Config.DynamicChart.setAutoScaleState(isOn);
+        Config.DynamicChart.setAutoScale(isOn);
         dynamicChart.updateChartSettings();
-        setSpinnersEnabledState(!isOn);
+        setPlotScalingControlsState(!isOn);
     }
 
     private void startSession() {
@@ -101,6 +112,8 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         jCheckBox1 = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
         jSpinner3 = new javax.swing.JSpinner();
+        jLabel5 = new javax.swing.JLabel();
+        jSpinner4 = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("OscilloscopeUI");
@@ -141,7 +154,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel1.setText("Minimum range:");
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(0.0d), null, null, Double.valueOf(0.1d)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.MIN_RANGE), null, null, Double.valueOf(0.1d)));
         jSpinner1.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -151,7 +164,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel2.setText("Maximum range:");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(2.56d), null, null, Double.valueOf(0.1d)));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.MAX_RANGE), null, null, Double.valueOf(0.1d)));
         jSpinner2.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -178,11 +191,20 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel4.setText("Buffer offset:");
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(200, 10, 10000, 1));
+        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(Config.DynamicChart.BUFFER_OFFSET, 10, 10000, 1));
         jSpinner3.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner3.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner3StateChanged(evt);
+            }
+        });
+
+        jLabel5.setText("Gain:");
+
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.GAIN), null, null, Double.valueOf(0.1d)));
+        jSpinner4.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSpinner4StateChanged(evt);
             }
         });
 
@@ -193,16 +215,18 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel1)
-                        .addComponent(jSpinner2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3)
-                        .addComponent(jLabel4)
-                        .addComponent(jSpinner3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jCheckBox1)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel5)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jSpinner4, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jSpinner2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jSpinner1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jSpinner3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -222,11 +246,15 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel5)
+                .addGap(3, 3, 3)
+                .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(133, Short.MAX_VALUE))
+                .addContainerGap(73, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -302,6 +330,11 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         dynamicChart.updateChartSettings();
     }//GEN-LAST:event_jSpinner3StateChanged
 
+    private void jSpinner4StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner4StateChanged
+        Config.DynamicChart.setGain(Double.parseDouble(jSpinner4.getValue().toString()));
+        dynamicChart.updateChartSettings();
+    }//GEN-LAST:event_jSpinner4StateChanged
+
     /**
      * @param args the command line arguments
      */
@@ -313,17 +346,11 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(OscilloscopeUIView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(OscilloscopeUIView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(OscilloscopeUIView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(OscilloscopeUIView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
-
+            @Override
             public void run() {
                 new OscilloscopeUIView().setVisible(true);
             }
@@ -337,15 +364,17 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSpinner jSpinner3;
+    private javax.swing.JSpinner jSpinner4;
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
 
-    private void setSpinnersEnabledState(boolean state) {
+    private void setPlotScalingControlsState(boolean state) {
         jLabel1.setEnabled(state);
         jLabel2.setEnabled(state);
         jSpinner1.setEnabled(state);
@@ -354,13 +383,15 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
     private void setPlotSettingsComponentsState(boolean state) {
         if (!jCheckBox1.isSelected()) {
-            setSpinnersEnabledState(state);
+            setPlotScalingControlsState(state);
         }
         jCheckBox1.setEnabled(state);
         jComboBox1.setEnabled(state);
         jComboBox2.setEnabled(state);
         jLabel3.setEnabled(state);
         jLabel4.setEnabled(state);
+        jLabel5.setEnabled(state);
         jSpinner3.setEnabled(state);
+        jSpinner4.setEnabled(state);
     }
 }

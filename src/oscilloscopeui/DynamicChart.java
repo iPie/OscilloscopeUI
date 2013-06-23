@@ -61,9 +61,9 @@ public class DynamicChart {
             for (double d : samplesBuffer) {
                 sample += d;
             }
-            sample = (sample / samplesCount)
+            sample = ((sample / samplesCount)
                     * (Config.DynamicChart.REFERENCE_VOLTAGE / Config.DynamicChart.ADC_RESOLUTION)
-                    + Config.DynamicChart.GAIN;
+                    + Config.DynamicChart.GAIN) * Config.DynamicChart.MULTIPLIER;
             this.addY(sample);
             samplesBuffer.clear();
         }

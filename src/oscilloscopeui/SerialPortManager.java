@@ -34,7 +34,6 @@ public class SerialPortManager {
     }
 
     public void startListening() throws SerialPortException {
-        System.out.println("startListening()");
         if (portExists()) {
             if (!serialPort.isOpened()) {
                 serialPort.openPort();
@@ -84,18 +83,6 @@ public class SerialPortManager {
                     parseBuffer(buffer, bytesCount);
                 } catch (SerialPortException ex) {
                     System.out.println(ex);
-                }
-            } else if (event.isCTS()) {
-                if (event.getEventValue() == 1) {
-                    System.out.println("CTS - ON");
-                } else {
-                    System.out.println("CTS - OFF");
-                }
-            } else if (event.isDSR()) {
-                if (event.getEventValue() == 1) {
-                    System.out.println("DSR - ON");
-                } else {
-                    System.out.println("DSR - OFF");
                 }
             }
         }
