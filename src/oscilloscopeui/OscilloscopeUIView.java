@@ -30,7 +30,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             }
         });
         initComponents();
-        initializePeripherals();
+        initializePeripherals();       
     }
 
     private void initializePortList() {
@@ -67,6 +67,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     private void stopSession() {
         try {
             serialPortManager.stopListening();
+            dynamicChart.stopPlotting();
         } catch (SerialPortException ex) {
             Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
             initializePortList();

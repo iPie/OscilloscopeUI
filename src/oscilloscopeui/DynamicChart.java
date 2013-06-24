@@ -9,9 +9,12 @@ import info.monitorenter.util.Range;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -24,6 +27,7 @@ public class DynamicChart {
     private ITrace2D trace;
     private Date startTime;
     private List<Integer> samplesBuffer;
+    private DataStorage storage;
 
     public DynamicChart() {
         initilizeChart();
@@ -41,6 +45,13 @@ public class DynamicChart {
 
     public void stopPlotting() {
         samplesBuffer.clear();
+        try {
+            storage.close();
+        } catch (IOException ex) {
+            // TODO: notify user that writing to disk is not possible
+            Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
+                    "Failed to close data storage", ex);
+        }
     }
 
     public void addXY(double x, double y) {
@@ -56,6 +67,17 @@ public class DynamicChart {
     public void bufferizeValue(int value, int samplesCount) {
         if (samplesBuffer.size() <= samplesCount) {
             samplesBuffer.add(value);
+            try {
+                Date now = new Date();
+                // TODO: this might also overflow
+                // TODO: unreliable timestamp, values sometimes repeat
+                long mark = now.getTime() - startTime.getTime();
+                storage.storeValues(Integer.toString(value), Long.toString(mark));
+            } catch (IOException ex) {
+                // TODO: notify user that writing to disk is not possible
+                Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
+                        "Failed to store plotting data on disk", ex);
+            }
         } else {
             double sample = 0;
             for (double d : samplesBuffer) {
@@ -92,6 +114,7 @@ public class DynamicChart {
         chart.getAxisX().getAxisTitle().setTitle("t");
         chart.getAxisY().getAxisTitle().setTitle("V");
         samplesBuffer = new ArrayList<>();
+        storage = new DataStorage();
     }
 
     private void addChartToPanel(JPanel panel) {
