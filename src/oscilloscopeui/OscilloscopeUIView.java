@@ -30,7 +30,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             }
         });
         initComponents();
-        initializePeripherals();       
+        initializePeripherals();
     }
 
     private void initializePortList() {
@@ -53,12 +53,13 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             serialPortManager.addDynamicChart(dynamicChart);
             serialPortManager.startListening();
             sessionStarted = true;
+            // TODO: recording is supposed to be a separated feature?
             dynamicChart.startPlotting();
             jToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/stop.png")));
             jToggleButton1.setText("Stop");
             setPlotSettingsComponentsState(false);
         } catch (SerialPortException ex) {
-            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, "Failed to start listening. ".concat(ex.getMessage()));
             jToggleButton1.setSelected(false);
             initializePortList();
         }
@@ -67,11 +68,11 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     private void stopSession() {
         try {
             serialPortManager.stopListening();
-            dynamicChart.stopPlotting();
         } catch (SerialPortException ex) {
-            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, "Failed to stop listening. ".concat(ex.getMessage()));
             initializePortList();
         } finally {
+            dynamicChart.stopPlotting();
             sessionStarted = false;
             jToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/play.png")));
             jToggleButton1.setText("Start");
@@ -86,8 +87,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
             dynamicChart = new DynamicChart(jPanel1);
             initializePortList();
         } catch (NullPointerException ex) {
-            System.err.println("Could not initialize peripherals");
-            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OscilloscopeUIView.class.getName()).log(Level.SEVERE, "Could not initialize peripherals.", ex);
         }
     }
 

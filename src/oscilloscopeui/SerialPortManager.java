@@ -1,6 +1,5 @@
 package oscilloscopeui;
 
-import java.nio.ByteBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jssc.*;
@@ -42,7 +41,7 @@ public class SerialPortManager {
                 int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS + SerialPort.MASK_DSR;
                 serialPort.setEventsMask(mask);
                 serialPort.addEventListener(new SerialPortReader());
-                serialPort.writeByte((byte) 'R');
+                serialPort.writeByte(Config.Device.DEVICE_START_COMMAND);
             } else {
                 throw new SerialPortException(this.getSerialPortName(), "stopListening()", SerialPortException.TYPE_PORT_ALREADY_OPENED);
             }
@@ -54,7 +53,7 @@ public class SerialPortManager {
     public void stopListening() throws SerialPortException {
         if (portExists()) {
             if (serialPort.isOpened()) {
-                serialPort.writeByte((byte) 'S');
+                serialPort.writeByte(Config.Device.DEVICE_STOP_COMMAND);
                 serialPort.closePort();
             } else {
                 throw new SerialPortException(this.getSerialPortName(), "stopListening()", SerialPortException.TYPE_PORT_NOT_OPENED);

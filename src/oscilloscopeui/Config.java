@@ -46,6 +46,20 @@ public class Config {
         }
     }
 
+    public static class Device {
+
+        public static byte DEVICE_START_COMMAND = 0x52;
+        public static byte DEVICE_STOP_COMMAND = 0x53;
+
+        public static void setDeviceStartCommand(byte value) {
+            DEVICE_START_COMMAND = value;
+        }
+
+        public static void setDeviceStopCommand(byte value) {
+            DEVICE_STOP_COMMAND = value;
+        }
+    }
+
     public static class DynamicChart {
 
         public static boolean AUTO_SCALE = false;
@@ -114,6 +128,13 @@ public class Config {
             Config.DynamicChart.setMultiplier(Double.parseDouble(configFile.getProperty("MULTIPLIER")));
             Config.DynamicChart.setBufferOffset(Integer.parseInt(configFile.getProperty("BUFFER_OFFSET")));
             Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(configFile.getProperty("ANTIALIAS_SAMPLES_COUNT")));
+            Config.SerialPort.setBaundRate(Integer.parseInt(configFile.getProperty("BAUND_RATE")));
+            Config.SerialPort.setDataBits(Integer.parseInt(configFile.getProperty("DATA_BITS")));
+            Config.SerialPort.setStopBits(Integer.parseInt(configFile.getProperty("STOP_BITS")));
+            Config.SerialPort.setParity(Integer.parseInt(configFile.getProperty("PARITY")));
+            Config.SerialPort.setDebugSerialPort(Boolean.parseBoolean(configFile.getProperty("DEBUG_SERIAL_PORT")));
+            Config.Device.setDeviceStartCommand(Byte.parseByte(configFile.getProperty("DEVICE_START_COMMAND")));
+            Config.Device.setDeviceStopCommand(Byte.parseByte(configFile.getProperty("DEVICE_STOP_COMMAND")));
         } catch (Exception e) {
             Logger.getLogger(Config.class.getName()).log(Level.WARNING, "Invalid configuration file", e);
         }
@@ -136,6 +157,8 @@ public class Config {
             configFile.setProperty("STOP_BITS", Integer.toString(Config.SerialPort.STOP_BITS));
             configFile.setProperty("PARITY", Integer.toString(Config.SerialPort.PARITY));
             configFile.setProperty("DEBUG_SERIAL_PORT", Boolean.toString(Config.SerialPort.DEBUG_SERIAL_PORT));
+            configFile.setProperty("DEVICE_START_COMMAND", Byte.toString(Config.Device.DEVICE_START_COMMAND));
+            configFile.setProperty("DEVICE_STOP_COMMAND", Byte.toString(Config.Device.DEVICE_STOP_COMMAND));
             Logger.getLogger(Config.class.getName()).log(Level.INFO, "Saving ".concat(CONFIG_FILE_PATH));
             File file = new File(CONFIG_FILE_PATH);
             try (OutputStream out = new FileOutputStream(file)) {
