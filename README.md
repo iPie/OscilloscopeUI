@@ -6,6 +6,10 @@ Graphical user interface for AVR-based oscilloscope in Java.
 
 * **Real-time plotting**
 
+* **Data export**
+
+* **Zero-level calibration**
+
 * **Multiple channels support** *(in progress)*
 
 * **Oversampling support** *(in progress)*

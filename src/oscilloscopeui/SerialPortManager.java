@@ -96,7 +96,7 @@ public class SerialPortManager {
                     chart.bufferizeValue(value, Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT);
                 }
             } catch (Exception ex) {
-                Logger.getLogger(SerialPortManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(SerialPortManager.class.getName()).log(Level.SEVERE, "Could not parse serial data.", ex);
             }
         }
     }

@@ -71,6 +71,7 @@ public class Config {
         public static double MULTIPLIER = 5.54545455;
         public static int BUFFER_OFFSET = 200;
         public static int ANTIALIAS_SAMPLES_COUNT = 64;
+        public static int CALIBRATION_VALUES_COUNT = 32;
 
         public static void setAutoScale(boolean value) {
             AUTO_SCALE = value;
@@ -100,12 +101,18 @@ public class Config {
             MULTIPLIER = value;
         }
 
+        // TODO: restrict overflow (max = int size / value)
         public static void setBufferOffset(int value) {
             BUFFER_OFFSET = value;
         }
 
         public static void setAntialiasSamplesCount(int value) {
             ANTIALIAS_SAMPLES_COUNT = value;
+        }
+
+        // TODO: restrict overflow!
+        public static void setCalibrationValuesCount(int value) {
+            CALIBRATION_VALUES_COUNT = value;
         }
     }
 
@@ -119,7 +126,8 @@ public class Config {
             return;
         }
         try {
-            Config.DynamicChart.setAutoScale(Boolean.parseBoolean(configFile.getProperty("AUTO_SCALE")));
+            // Commented values probably should not be saved
+            //Config.DynamicChart.setAutoScale(Boolean.parseBoolean(configFile.getProperty("AUTO_SCALE")));
             Config.DynamicChart.setMinRange(Double.parseDouble(configFile.getProperty("MIN_RANGE")));
             Config.DynamicChart.setMaxRange(Double.parseDouble(configFile.getProperty("MAX_RANGE")));
             Config.DynamicChart.setReferenceVoltage(Double.parseDouble(configFile.getProperty("REFERENCE_VOLTAGE")));
@@ -127,7 +135,8 @@ public class Config {
             Config.DynamicChart.setGain(Double.parseDouble(configFile.getProperty("GAIN")));
             Config.DynamicChart.setMultiplier(Double.parseDouble(configFile.getProperty("MULTIPLIER")));
             Config.DynamicChart.setBufferOffset(Integer.parseInt(configFile.getProperty("BUFFER_OFFSET")));
-            Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(configFile.getProperty("ANTIALIAS_SAMPLES_COUNT")));
+            //Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(configFile.getProperty("ANTIALIAS_SAMPLES_COUNT")));
+            Config.DynamicChart.setCalibrationValuesCount(Integer.parseInt(configFile.getProperty("CALIBRATION_VALUES_COUNT")));
             Config.SerialPort.setBaundRate(Integer.parseInt(configFile.getProperty("BAUND_RATE")));
             Config.SerialPort.setDataBits(Integer.parseInt(configFile.getProperty("DATA_BITS")));
             Config.SerialPort.setStopBits(Integer.parseInt(configFile.getProperty("STOP_BITS")));
@@ -143,7 +152,8 @@ public class Config {
     public static void saveConfigFile() {
         Properties configFile = new Properties();
         try {
-            configFile.setProperty("AUTO_SCALE", Boolean.toString(Config.DynamicChart.AUTO_SCALE));
+            // Commented values probably should not be saved
+            //configFile.setProperty("AUTO_SCALE", Boolean.toString(Config.DynamicChart.AUTO_SCALE));
             configFile.setProperty("MIN_RANGE", Double.toString(Config.DynamicChart.MIN_RANGE));
             configFile.setProperty("MAX_RANGE", Double.toString(Config.DynamicChart.MAX_RANGE));
             configFile.setProperty("REFERENCE_VOLTAGE", Double.toString(Config.DynamicChart.REFERENCE_VOLTAGE));
@@ -151,7 +161,8 @@ public class Config {
             configFile.setProperty("GAIN", Double.toString(Config.DynamicChart.GAIN));
             configFile.setProperty("MULTIPLIER", Double.toString(Config.DynamicChart.MULTIPLIER));
             configFile.setProperty("BUFFER_OFFSET", Integer.toString(Config.DynamicChart.BUFFER_OFFSET));
-            configFile.setProperty("ANTIALIAS_SAMPLES_COUNT", Integer.toString(Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT));
+            //configFile.setProperty("ANTIALIAS_SAMPLES_COUNT", Integer.toString(Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT));
+            configFile.setProperty("CALIBRATION_VALUES_COUNT", Integer.toString(Config.DynamicChart.CALIBRATION_VALUES_COUNT));
             configFile.setProperty("BAUND_RATE", Integer.toString(Config.SerialPort.BAUND_RATE));
             configFile.setProperty("DATA_BITS", Integer.toString(Config.SerialPort.DATA_BITS));
             configFile.setProperty("STOP_BITS", Integer.toString(Config.SerialPort.STOP_BITS));

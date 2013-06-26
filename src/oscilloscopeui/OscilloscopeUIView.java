@@ -31,6 +31,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         });
         initComponents();
         initializePeripherals();
+        updateUIControls();
     }
 
     private void initializePortList() {
@@ -115,6 +116,12 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         jSpinner3 = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
         jSpinner4 = new javax.swing.JSpinner();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("OscilloscopeUI");
@@ -155,7 +162,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel1.setText("Minimum range:");
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.MIN_RANGE), null, null, Double.valueOf(0.1d)));
+        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(-5.0d), null, null, Double.valueOf(0.1d)));
         jSpinner1.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -165,7 +172,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel2.setText("Maximum range:");
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.MAX_RANGE), null, null, Double.valueOf(0.1d)));
+        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(5.0d), null, null, Double.valueOf(0.1d)));
         jSpinner2.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -192,7 +199,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel4.setText("Buffer offset:");
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(Config.DynamicChart.BUFFER_OFFSET, 10, 10000, 1));
+        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(200), null, null, Integer.valueOf(1)));
         jSpinner3.setMaximumSize(new java.awt.Dimension(29, 20));
         jSpinner3.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -202,7 +209,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel5.setText("Gain:");
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(Config.DynamicChart.GAIN), null, null, Double.valueOf(0.1d)));
+        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(Double.valueOf(0.0d), null, null, Double.valueOf(0.1d)));
         jSpinner4.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSpinner4StateChanged(evt);
@@ -255,8 +262,30 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(52, Short.MAX_VALUE))
         );
+
+        jMenu1.setText("File");
+        jMenu1.add(jSeparator1);
+
+        jMenuItem2.setText("Exit");
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+
+        jMenuItem1.setText("Calibrate zero");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -336,6 +365,10 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         dynamicChart.updateChartSettings();
     }//GEN-LAST:event_jSpinner4StateChanged
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        dynamicChart.calibrate();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -366,14 +399,29 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSpinner jSpinner3;
     private javax.swing.JSpinner jSpinner4;
     private javax.swing.JToggleButton jToggleButton1;
     // End of variables declaration//GEN-END:variables
+
+    private void updateUIControls() {
+        // TODO: do something about antialias drop-down
+        jSpinner1.setValue(Config.DynamicChart.MIN_RANGE);
+        jSpinner2.setValue(Config.DynamicChart.MAX_RANGE);
+        jSpinner3.setValue(Config.DynamicChart.BUFFER_OFFSET);
+        jSpinner4.setValue(Config.DynamicChart.GAIN);
+        //jCheckBox1.setSelected(Config.DynamicChart.AUTO_SCALE);
+    }
 
     private void setPlotScalingControlsState(boolean state) {
         jLabel1.setEnabled(state);

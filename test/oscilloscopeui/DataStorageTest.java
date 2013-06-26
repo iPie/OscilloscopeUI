@@ -1,12 +1,9 @@
 package oscilloscopeui;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
