@@ -72,6 +72,7 @@ public class Config {
         public static int BUFFER_OFFSET = 200;
         public static int ANTIALIAS_SAMPLES_COUNT = 64;
         public static int CALIBRATION_VALUES_COUNT = 32;
+        public static boolean ALLOW_PLOT_DISK_STORAGE = false;
 
         public static void setAutoScale(boolean value) {
             AUTO_SCALE = value;
@@ -114,6 +115,10 @@ public class Config {
         public static void setCalibrationValuesCount(int value) {
             CALIBRATION_VALUES_COUNT = value;
         }
+        
+        public static void setAllowDiskStorage(boolean value) {
+            ALLOW_PLOT_DISK_STORAGE = value;
+        }        
     }
 
     public static void loadConfigFile() {
@@ -137,6 +142,7 @@ public class Config {
             Config.DynamicChart.setBufferOffset(Integer.parseInt(configFile.getProperty("BUFFER_OFFSET")));
             //Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(configFile.getProperty("ANTIALIAS_SAMPLES_COUNT")));
             Config.DynamicChart.setCalibrationValuesCount(Integer.parseInt(configFile.getProperty("CALIBRATION_VALUES_COUNT")));
+            Config.DynamicChart.setAllowDiskStorage(Boolean.parseBoolean(configFile.getProperty("ALLOW_PLOT_DISK_STORAGE")));
             Config.SerialPort.setBaundRate(Integer.parseInt(configFile.getProperty("BAUND_RATE")));
             Config.SerialPort.setDataBits(Integer.parseInt(configFile.getProperty("DATA_BITS")));
             Config.SerialPort.setStopBits(Integer.parseInt(configFile.getProperty("STOP_BITS")));
@@ -163,6 +169,7 @@ public class Config {
             configFile.setProperty("BUFFER_OFFSET", Integer.toString(Config.DynamicChart.BUFFER_OFFSET));
             //configFile.setProperty("ANTIALIAS_SAMPLES_COUNT", Integer.toString(Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT));
             configFile.setProperty("CALIBRATION_VALUES_COUNT", Integer.toString(Config.DynamicChart.CALIBRATION_VALUES_COUNT));
+            configFile.setProperty("ALLOW_PLOT_DISK_STORAGE", Boolean.toString(Config.DynamicChart.ALLOW_PLOT_DISK_STORAGE));
             configFile.setProperty("BAUND_RATE", Integer.toString(Config.SerialPort.BAUND_RATE));
             configFile.setProperty("DATA_BITS", Integer.toString(Config.SerialPort.DATA_BITS));
             configFile.setProperty("STOP_BITS", Integer.toString(Config.SerialPort.STOP_BITS));

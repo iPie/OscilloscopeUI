@@ -68,25 +68,27 @@ public class DynamicChart {
     }
 
     public void bufferizeValue(int value, int samplesCount) {
-        if (samplesBuffer.size() <= samplesCount) {
+        if (samplesBuffer.size() < samplesCount) {
             samplesBuffer.add(value);
             if (isCalibrating) {
                 calibrate(value);
             }
-            try {
-                Date now = new Date();
-                // TODO: this might also overflow
-                // TODO: unreliable timestamp, values sometimes repeat
-                long mark = now.getTime() - startTime.getTime();
-                storage.storeValues(Integer.toString(value), Long.toString(mark));
-            } catch (IOException ex) {
-                // TODO: notify user that writing to disk is not possible
-                Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
-                        "Failed to store plotting data on disk", ex);
+            if (Config.DynamicChart.ALLOW_PLOT_DISK_STORAGE) {
+                try {
+                    Date now = new Date();
+                    // TODO: this might also overflow
+                    // TODO: unreliable timestamp, values sometimes repeat
+                    long mark = now.getTime() - startTime.getTime();
+                    storage.storeValues(Integer.toString(value), Long.toString(mark));
+                } catch (IOException ex) {
+                    // TODO: notify user that writing to disk is not possible
+                    Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
+                            "Failed to store plotting data on disk", ex);
+                }
             }
         } else {
-            int sample = 0;
-            for (int d : samplesBuffer) {
+            double sample = 0;
+            for (double d : samplesBuffer) {
                 sample += d;
             }
             this.addY(resultToVoltage(sample / samplesCount));
@@ -95,11 +97,12 @@ public class DynamicChart {
     }
 
     /**
-     * Calibrates the zero-level. The calibration is performed by analyzing 
-     * a set of values transfered over the serial port. The values are processed
-     * using the tri-sigma rule and the mean value of the resulting value is then
-     * applied to the Config.DynamicChart.GAIN property. The maximum number of
-     * values to be analyzed is specified in Config.DynamicChart.CALIBRATION_VALUES_COUNT
+     * Calibrates the zero-level. The calibration is performed by analyzing a
+     * set of values transfered over the serial port. The values are processed
+     * using the tri-sigma rule and the mean value of the resulting value is
+     * then applied to the Config.DynamicChart.GAIN property. The maximum number
+     * of values to be analyzed is specified in
+     * Config.DynamicChart.CALIBRATION_VALUES_COUNT
      */
     public void calibrate() {
         if (!isCalibrating) {
@@ -145,7 +148,6 @@ public class DynamicChart {
                     n++;
                 }
             }
-            System.out.println(n);
             cmean /= n;
             this.isCalibrating = false;
             cmean = resultToVoltage(-cmean, 0);
