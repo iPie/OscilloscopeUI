@@ -91,7 +91,7 @@ public class SerialPortManager {
                 for (int i = 0; i < length; i += 2) {
                     int value = (buffer[i + 1] << 8 | (buffer[i] & 0xFF)); // AND with 0xFF to handle unsigned types in Java
                     if (Config.SerialPort.DEBUG_SERIAL_PORT == true) {
-                        System.out.println(value);
+                        System.out.println(value + " -> " + (int) buffer[i] + ", " + (int) buffer[i + 1]);
                     }
                     chart.bufferizeValue(value, Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT);
                 }

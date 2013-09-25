@@ -11,7 +11,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,24 +24,23 @@ public class DynamicChart {
 
     private Chart2D chart;
     private ITrace2D trace;
-    private Date startTime;
+    int timeStamp = 0;
     private List<Integer> samplesBuffer;
     private DataStorage storage;
     private boolean isCalibrating;
     private List<Double> calibrationValues;
 
     public DynamicChart() {
-        initilizeChart();
+        initializeChart();
     }
 
     public DynamicChart(JPanel panel) {
-        initilizeChart();
+        initializeChart();
         addChartToPanel(panel);
     }
 
     public void startPlotting() {
         updateChartSettings();
-        startTime = new Date();
     }
 
     public void stopPlotting() {
@@ -62,9 +60,7 @@ public class DynamicChart {
     }
 
     public void addY(double y) {
-        // TODO: handle time overflow!
-        Date now = new Date();
-        this.addXY((now.getTime() - startTime.getTime()), y);
+        this.addXY(this.getTimeStamp(), y);
     }
 
     public void bufferizeValue(int value, int samplesCount) {
@@ -73,18 +69,13 @@ public class DynamicChart {
             if (isCalibrating) {
                 calibrate(value);
             }
-            if (Config.DynamicChart.ALLOW_PLOT_DISK_STORAGE) {
-                try {
-                    Date now = new Date();
-                    // TODO: this might also overflow
-                    // TODO: unreliable timestamp, values sometimes repeat
-                    long mark = now.getTime() - startTime.getTime();
-                    storage.storeValues(Integer.toString(value), Long.toString(mark));
-                } catch (IOException ex) {
-                    // TODO: notify user that writing to disk is not possible
-                    Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
-                            "Failed to store plotting data on disk", ex);
-                }
+            try {
+                double stamp = this.getTimeStamp();
+                storage.storeValues(Integer.toString(value), Double.toString(stamp));
+            } catch (IOException ex) {
+                // TODO: notify user that writing to disk is not possible
+                Logger.getLogger(DynamicChart.class.getName()).log(Level.SEVERE,
+                        "Failed to store plotting data on disk", ex);
             }
         } else {
             double sample = 0;
@@ -143,7 +134,7 @@ public class DynamicChart {
             double cmean = 0;
             n = 0;
             for (double d : calibrationValues) {
-                if (d > mean - 3 * sigma && d < mean + 3 * sigma) {
+                if (d >= mean - 3 * sigma && d <= mean + 3 * sigma) {
                     cmean += d;
                     n++;
                 }
@@ -167,7 +158,7 @@ public class DynamicChart {
         return resultToVoltage(value, Config.DynamicChart.GAIN);
     }
 
-    private void initilizeChart() {
+    private void initializeChart() {
         chart = new Chart2D();
         this.updateChartSettings();
         chart.getAxisY().setPaintGrid(true);
@@ -183,5 +174,10 @@ public class DynamicChart {
         panel.setLayout(new BorderLayout());
         panel.add(chart);
         panel.updateUI();
+    }
+
+    private int getTimeStamp() {
+        // TODO: handle time overflow!
+        return ++timeStamp;
     }
 }

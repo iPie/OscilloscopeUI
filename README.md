@@ -12,8 +12,6 @@ Graphical user interface for AVR-based oscilloscope in Java.
 
 * **Multiple channels support** *(in progress)*
 
-* **Oversampling support** *(in progress)*
-
 ### Libraries
 
 * **jSSC-0.9.0**

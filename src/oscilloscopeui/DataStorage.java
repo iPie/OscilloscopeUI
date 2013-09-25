@@ -24,43 +24,51 @@ public class DataStorage {
     }
 
     public DataStorage(String outputDirectory) {
-        this.directory = outputDirectory;
-        isOpen = false;
+        if (Config.DATA.ALLOW_DISK_STORAGE) {
+            this.directory = outputDirectory;
+            isOpen = false;
+        } else {
+            this.directory = null;
+        }
     }
 
     public void close() throws IOException {
-        if (isOpen) {
-            Logger.getLogger(Config.class.getName()).log(Level.INFO, "Saving ".concat(storageFile.getAbsoluteFile().getPath()));
-            bufferedWriter.close();
-            isOpen = false;
-        } else {
-            throw new IOException("File is not open");
+        if (Config.DATA.ALLOW_DISK_STORAGE) {
+            if (isOpen) {
+                Logger.getLogger(Config.class.getName()).log(Level.INFO, "Saving ".concat(storageFile.getAbsoluteFile().getPath()));
+                bufferedWriter.close();
+                isOpen = false;
+            } else {
+                throw new IOException("File is not open");
+            }
         }
     }
 
     public void storeValues(String... values) throws IOException {
-        if (!isOpen) {
-            Date now = new Date();
-            String filename = now.toString().replaceAll("[\\/:\\s]", "-");
-            storageFile = new File(directory.concat("/").concat(filename).concat(".plot"));
-            if (storageFile.exists()) {
-                // TODO: generate a different name
-            } else {
-                storageFile.createNewFile();
+        if (Config.DATA.ALLOW_DISK_STORAGE) {
+            if (!isOpen) {
+                Date now = new Date();
+                String filename = now.toString().replaceAll("[\\/:\\s]", "-");
+                storageFile = new File(directory.concat("/").concat(filename).concat(".plot"));
+                if (storageFile.exists()) {
+                    // TODO: generate a different name
+                } else {
+                    storageFile.createNewFile();
+                }
+                FileWriter fw = new FileWriter(storageFile.getAbsoluteFile());
+                bufferedWriter = new BufferedWriter(fw);
+                isOpen = true;
             }
-            FileWriter fw = new FileWriter(storageFile.getAbsoluteFile());
-            bufferedWriter = new BufferedWriter(fw);
-            isOpen = true;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            sb.append(values[i]);
-            if (i != values.length - 1) {
-                sb.append(",");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < values.length; i++) {
+                sb.append(values[i]);
+                if (i != values.length - 1) {
+                    sb.append(",");
+                }
             }
+            bufferedWriter.write(sb.toString());
+            bufferedWriter.newLine();
         }
-        bufferedWriter.write(sb.toString());
-        bufferedWriter.newLine();
     }
 
     /**
@@ -72,6 +80,10 @@ public class DataStorage {
      */
     @Deprecated
     public File getStorageFile() {
-        return this.storageFile;
+        if (Config.DATA.ALLOW_DISK_STORAGE) {
+            return this.storageFile;
+        } else {
+            return null;
+        }
     }
 }

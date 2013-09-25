@@ -14,12 +14,12 @@ import java.util.logging.Logger;
  */
 public class Config {
 
-    private static String CONFIG_FILE_PATH = System.getProperty("user.dir").concat("\\OscilloscopeUI.cfg");
+    private static String CONFIG_FILE_PATH = System.getProperty("user.dir").concat("/OscilloscopeUI.cfg");
     //private static String CONFIG_FILE_PATH = "d:/Soft/Java/NetBeansProjects/OscilloscopeUI/dist/OscilloscopeUI.cfg";
 
     public static class SerialPort {
 
-        public static int BAUND_RATE = 115200;
+        public static int BAUND_RATE = 500000;
         public static int DATA_BITS = 8;
         public static int STOP_BITS = 1;
         public static int PARITY = 0;
@@ -50,6 +50,7 @@ public class Config {
 
         public static byte DEVICE_START_COMMAND = 0x52;
         public static byte DEVICE_STOP_COMMAND = 0x53;
+        public static int DEVICE_DATA_BYTES_COUNT = 2;
 
         public static void setDeviceStartCommand(byte value) {
             DEVICE_START_COMMAND = value;
@@ -57,6 +58,10 @@ public class Config {
 
         public static void setDeviceStopCommand(byte value) {
             DEVICE_STOP_COMMAND = value;
+        }
+
+        public static void setDeviceDataBytesCount(int value) {
+            DEVICE_DATA_BYTES_COUNT = value;
         }
     }
 
@@ -70,9 +75,8 @@ public class Config {
         public static double GAIN = -1.38;
         public static double MULTIPLIER = 5.54545455;
         public static int BUFFER_OFFSET = 200;
-        public static int ANTIALIAS_SAMPLES_COUNT = 64;
+        public static int ANTIALIAS_SAMPLES_COUNT = 1;
         public static int CALIBRATION_VALUES_COUNT = 32;
-        public static boolean ALLOW_PLOT_DISK_STORAGE = false;
 
         public static void setAutoScale(boolean value) {
             AUTO_SCALE = value;
@@ -115,10 +119,15 @@ public class Config {
         public static void setCalibrationValuesCount(int value) {
             CALIBRATION_VALUES_COUNT = value;
         }
-        
+    }
+
+    public static class DATA {
+
+        public static boolean ALLOW_DISK_STORAGE = true;
+
         public static void setAllowDiskStorage(boolean value) {
-            ALLOW_PLOT_DISK_STORAGE = value;
-        }        
+            ALLOW_DISK_STORAGE = value;
+        }
     }
 
     public static void loadConfigFile() {
@@ -131,8 +140,6 @@ public class Config {
             return;
         }
         try {
-            // Commented values probably should not be saved
-            //Config.DynamicChart.setAutoScale(Boolean.parseBoolean(configFile.getProperty("AUTO_SCALE")));
             Config.DynamicChart.setMinRange(Double.parseDouble(configFile.getProperty("MIN_RANGE")));
             Config.DynamicChart.setMaxRange(Double.parseDouble(configFile.getProperty("MAX_RANGE")));
             Config.DynamicChart.setReferenceVoltage(Double.parseDouble(configFile.getProperty("REFERENCE_VOLTAGE")));
@@ -140,9 +147,8 @@ public class Config {
             Config.DynamicChart.setGain(Double.parseDouble(configFile.getProperty("GAIN")));
             Config.DynamicChart.setMultiplier(Double.parseDouble(configFile.getProperty("MULTIPLIER")));
             Config.DynamicChart.setBufferOffset(Integer.parseInt(configFile.getProperty("BUFFER_OFFSET")));
-            //Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(configFile.getProperty("ANTIALIAS_SAMPLES_COUNT")));
             Config.DynamicChart.setCalibrationValuesCount(Integer.parseInt(configFile.getProperty("CALIBRATION_VALUES_COUNT")));
-            Config.DynamicChart.setAllowDiskStorage(Boolean.parseBoolean(configFile.getProperty("ALLOW_PLOT_DISK_STORAGE")));
+            Config.DATA.setAllowDiskStorage(Boolean.parseBoolean(configFile.getProperty("ALLOW_DISK_STORAGE")));
             Config.SerialPort.setBaundRate(Integer.parseInt(configFile.getProperty("BAUND_RATE")));
             Config.SerialPort.setDataBits(Integer.parseInt(configFile.getProperty("DATA_BITS")));
             Config.SerialPort.setStopBits(Integer.parseInt(configFile.getProperty("STOP_BITS")));
@@ -150,6 +156,7 @@ public class Config {
             Config.SerialPort.setDebugSerialPort(Boolean.parseBoolean(configFile.getProperty("DEBUG_SERIAL_PORT")));
             Config.Device.setDeviceStartCommand(Byte.parseByte(configFile.getProperty("DEVICE_START_COMMAND")));
             Config.Device.setDeviceStopCommand(Byte.parseByte(configFile.getProperty("DEVICE_STOP_COMMAND")));
+            Config.Device.setDeviceDataBytesCount(Integer.parseInt(configFile.getProperty("DEVICE_DATA_BYTES_COUNT")));
         } catch (Exception e) {
             Logger.getLogger(Config.class.getName()).log(Level.WARNING, "Invalid configuration file", e);
         }
@@ -158,8 +165,6 @@ public class Config {
     public static void saveConfigFile() {
         Properties configFile = new Properties();
         try {
-            // Commented values probably should not be saved
-            //configFile.setProperty("AUTO_SCALE", Boolean.toString(Config.DynamicChart.AUTO_SCALE));
             configFile.setProperty("MIN_RANGE", Double.toString(Config.DynamicChart.MIN_RANGE));
             configFile.setProperty("MAX_RANGE", Double.toString(Config.DynamicChart.MAX_RANGE));
             configFile.setProperty("REFERENCE_VOLTAGE", Double.toString(Config.DynamicChart.REFERENCE_VOLTAGE));
@@ -167,9 +172,8 @@ public class Config {
             configFile.setProperty("GAIN", Double.toString(Config.DynamicChart.GAIN));
             configFile.setProperty("MULTIPLIER", Double.toString(Config.DynamicChart.MULTIPLIER));
             configFile.setProperty("BUFFER_OFFSET", Integer.toString(Config.DynamicChart.BUFFER_OFFSET));
-            //configFile.setProperty("ANTIALIAS_SAMPLES_COUNT", Integer.toString(Config.DynamicChart.ANTIALIAS_SAMPLES_COUNT));
             configFile.setProperty("CALIBRATION_VALUES_COUNT", Integer.toString(Config.DynamicChart.CALIBRATION_VALUES_COUNT));
-            configFile.setProperty("ALLOW_PLOT_DISK_STORAGE", Boolean.toString(Config.DynamicChart.ALLOW_PLOT_DISK_STORAGE));
+            configFile.setProperty("ALLOW_DISK_STORAGE", Boolean.toString(Config.DATA.ALLOW_DISK_STORAGE));
             configFile.setProperty("BAUND_RATE", Integer.toString(Config.SerialPort.BAUND_RATE));
             configFile.setProperty("DATA_BITS", Integer.toString(Config.SerialPort.DATA_BITS));
             configFile.setProperty("STOP_BITS", Integer.toString(Config.SerialPort.STOP_BITS));
@@ -177,6 +181,7 @@ public class Config {
             configFile.setProperty("DEBUG_SERIAL_PORT", Boolean.toString(Config.SerialPort.DEBUG_SERIAL_PORT));
             configFile.setProperty("DEVICE_START_COMMAND", Byte.toString(Config.Device.DEVICE_START_COMMAND));
             configFile.setProperty("DEVICE_STOP_COMMAND", Byte.toString(Config.Device.DEVICE_STOP_COMMAND));
+            configFile.setProperty("DEVICE_DATA_BYTES_COUNT", Integer.toString(Config.Device.DEVICE_DATA_BYTES_COUNT));
             Logger.getLogger(Config.class.getName()).log(Level.INFO, "Saving ".concat(CONFIG_FILE_PATH));
             File file = new File(CONFIG_FILE_PATH);
             try (OutputStream out = new FileOutputStream(file)) {

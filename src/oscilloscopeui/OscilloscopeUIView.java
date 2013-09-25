@@ -182,8 +182,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
 
         jLabel3.setText("Antialiasing:");
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "8", "16", "32", "64", "128", "256", "512" }));
-        jComboBox2.setSelectedIndex(3);
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "8", "16", "32", "64", "128", "256", "512" }));
         jComboBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2ActionPerformed(evt);
@@ -262,7 +261,7 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -342,7 +341,8 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
-        Config.DynamicChart.setAntialiasSamplesCount((jComboBox2.getSelectedIndex() + 1) * 8);
+        Config.DynamicChart.setAntialiasSamplesCount(Integer.parseInt(jComboBox2.getSelectedItem().toString()));
+        System.out.println(Integer.parseInt(jComboBox2.getSelectedItem().toString()));
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
     private void jSpinner1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner1StateChanged
@@ -420,7 +420,6 @@ public class OscilloscopeUIView extends javax.swing.JFrame {
         jSpinner2.setValue(Config.DynamicChart.MAX_RANGE);
         jSpinner3.setValue(Config.DynamicChart.BUFFER_OFFSET);
         jSpinner4.setValue(Config.DynamicChart.GAIN);
-        //jCheckBox1.setSelected(Config.DynamicChart.AUTO_SCALE);
     }
 
     private void setPlotScalingControlsState(boolean state) {
